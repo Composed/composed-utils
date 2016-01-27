@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eo pipefail
+
+if ! [[ "$(id -u)" -eq "0" ]]; then
+  echo "Must be run as root"
+  exit 1
+fi
+
+apt-get clean
+find /var/lib/apt/lists -mount -type f -delete
+apt-get clean

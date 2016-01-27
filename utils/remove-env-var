@@ -1,0 +1,35 @@
+#! /bin/bash
+set -e
+
+usage() {
+cat <<-EOF
+Usage:       remove-env-var -n [name]
+Description: this will remove the parameter pair from both the /etc/environment file
+             and the sudoers environment
+EOF
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+    exit 1
+fi
+
+while getopts ":n:v:" o; do
+    case "${o}" in
+        n)
+            name=${OPTARG}
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+cat <<EOF |
+rm /files/etc/environment/${name}
+EOF
+augtool -s
+
+source "$(which remove-variable-from-sudoer)" ${name}

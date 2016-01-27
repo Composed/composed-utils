@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+for i in "$@"; do
+
+  echo "removing sudoers env_check '${i}'"
+  if grep -q "+= ${i}$" /etc/sudoers; then
+    cat <<EOF |
+rm /files/etc/sudoers/Defaults/env_check/*[self::var="$i"]/../..
+EOF
+  augtool -s
+  fi
+
+done

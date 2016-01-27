@@ -1,0 +1,49 @@
+#! /bin/bash
+set -e
+
+usage() {
+cat <<-EOF
+Usage:       add-env-var -n [name] -v [value] -d [default, optional the default file in /etc/default to add the var]
+Description: this will write the parameter pair to both the /etc/environment file
+             and make it available in the sudoers environment
+EOF
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+    exit 1
+fi
+
+while getopts ":n:v:d:k:" o; do
+    case "${o}" in
+        n)
+            name=${OPTARG}
+            ;;
+        v)
+            value=${OPTARG}
+            ;;
+        d)
+            default=${OPTARG}
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+if [ -n "$default" ]; then
+  cat <<EOF |
+set /files/etc/default/$default/${name} '"${value}"'
+EOF
+  augtool -s
+else
+  cat <<EOF |
+set /files/etc/environment/${name} '"${value}"'
+EOF
+  augtool -s
+fi
+
+
+source "$(which expose-variable-to-sudoer)" "$name"

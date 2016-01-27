@@ -1,0 +1,14 @@
+#! /bin/bash 
+set -e
+
+name=$1; shift
+
+echo "setting sudoers env_keep '${name}'"
+if ! grep -q "+= ${name}$" /etc/sudoers; then
+cat <<EOF |
+set /files/etc/sudoers/Defaults[last()+1]/env_keep ""
+set /files/etc/sudoers/Defaults[last()]/env_keep/append ""
+set /files/etc/sudoers/Defaults[last()]/env_keep/var "${name}"
+EOF
+augtool -s
+fi

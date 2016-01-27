@@ -1,0 +1,46 @@
+#! /bin/bash
+set -eo pipefail
+
+usage() {
+cat <<-EOF
+Usage:       package -n [name] -v [version] -p [priority]
+Description: pin a debian package to an absolute version
+EOF
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+    exit 1
+fi
+
+while getopts ":n:v:p:" o; do
+    case "${o}" in
+        n)
+            name=${OPTARG}
+            ;;
+        v)
+            version=${OPTARG}
+            ;;
+        p)
+            priority=${OPTARG}
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+path="/etc/apt/preferences.d/$name"
+
+if [[  ! -f "$path" ]] ||
+  ! grep -q "^Pin: version ${version}$" "$path" ||
+  ! grep -q "^Pin-Priority: ${priority}$" "$path"; then
+
+    cat <<EOF > ${path}
+Package: ${name}
+Pin: version ${version}
+Pin-Priority: ${priority}
+EOF
+fi

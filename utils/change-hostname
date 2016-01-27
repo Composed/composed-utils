@@ -1,0 +1,49 @@
+#! /bin/bash
+set -e
+
+USAGE="Usage: change-hostname -e [environment] -c [cluster] -i [identifier for the machine] -d [ip address] -p [project]"
+
+if [ $# -eq 0 ]
+then
+    echo "${USAGE}"
+    exit 1
+fi
+
+while getopts ":e:c:i:p:d:" o; do
+    case "${o}" in
+        e)
+            environment=${OPTARG}
+            ;;
+        c)
+            cluster=${OPTARG}
+            ;;
+        p)
+            project=${OPTARG}
+            ;;
+        i)
+            id=${OPTARG}
+            ;;
+        d)
+            ipaddr=${OPTARG}
+            ;;
+        *)
+            echo "$USAGE"
+            exit 1
+            ;;
+    esac
+done
+
+export hostname="${project}-${environment}-${cluster}-${id#i-}"
+
+if ! grep -qwi "$hostname" /etc/hosts; then
+    sed -i -e "/^$ipaddr/d" /etc/hosts; echo "$ipaddr" "$hostname" >> /etc/hosts
+fi
+
+if ! grep -qwi "$hostname" /etc/hostname; then
+cat <<EOF |
+set /files/etc/hostname/hostname "${hostname}"
+EOF
+augtool -s
+fi
+
+hostname "$hostname"

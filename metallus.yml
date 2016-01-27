@@ -1,0 +1,22 @@
+packages:
+  branch_codenames:
+    master: trusty-unstable
+    production: trusty-stable
+
+jobs:
+  composed-utils:
+    builder: "make"
+    base: "quay.io/madebymany/build-bases:trusty"
+# Do we need any?
+#    build_depends:
+    packages:
+      - type: debian
+      name: composed-utils
+        depends:
+          - augeas-tools
+          - jq
+          - sed
+          - slackcat
+        repos:
+          - composed-public
+        target: install

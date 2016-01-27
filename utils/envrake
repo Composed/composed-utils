@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+usage() {
+cat <<-EOF
+Usage:       envrake [directory] [environment]
+Description: preloads a set of environment variables from /etc/default/{e} and then executes rake from the passed directory
+EOF
+}
+
+if [ $# -eq 0 ]
+then
+    usage
+    exit 1
+fi
+
+directory=$1; shift
+
+env=$1; shift
+
+if [[ -z "$directory" || -z "$env" ]]; then
+  usage
+  exit 1
+fi
+
+user="$(stat -c '%U' "$directory")"
+
+cd "$directory"
+
+bin=$(which load-env)
+source "$bin" "$env"
+
+sudo -Eu "$user" bundle exec rake "$@"

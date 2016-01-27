@@ -1,0 +1,31 @@
+#!/bin/bash
+set -eo pipefail
+
+if [ $# -eq 0 ]
+then
+  cat <<EOF
+  Usage: instance-identity [property]
+
+  Valid properties:
+
+  - privateIp
+  - availabilityZone
+  - region
+  - devpayProductCodes
+  - ramdiskId
+  - kernelId
+  - version
+  - instanceId
+  - billingProducts
+  - accountId
+  - architecture
+  - imageId
+  - pendingTime
+  - instanceType
+
+EOF
+  exit 1
+
+fi
+
+curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r ".$1"

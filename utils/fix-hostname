@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set-instance-id
+source global-env
+hostname="$(instance-identity instanceId)"
+change-hostname -i "${hostname#i-}" -p "${PROJECT}" -c "${CLUSTER}" -d "127.0.1.1" -e "${ENVIRONMENT}"

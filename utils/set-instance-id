@@ -1,0 +1,10 @@
+#! /bin/bash
+set -e
+
+id="$(curl http://169.254.169.254/latest/meta-data/instance-id)"
+if ! grep -qi "INSTANCE_ID=${id}" /etc/environment; then
+  cat <<EOF |
+set /files/etc/environment/INSTANCE_ID '"${id}"'
+EOF
+  augtool -s
+fi

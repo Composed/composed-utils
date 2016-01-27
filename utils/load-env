@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+if [[ -n $1 ]]; then
+  load_env_fn="/etc/default/$1"
+  if [[ -f $load_env_fn && -r $load_env_fn ]]; then
+    load_env_vars="$(sed -e 's/^/export /' "$load_env_fn")"
+
+    if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+      # in subshell, so being eval'd
+      printf '%s\n' "$load_env_vars"
+    else
+      # being sourced, so eval ourselves
+      eval "$load_env_vars"
+    fi
+    unset load_env_vars
+  fi
+  unset load_env_fn
+fi
+
+if command -v global-env >/dev/null; then
+  source global-env
+fi

@@ -1,0 +1,48 @@
+#!/usr/bin/python
+
+import requests
+import json
+import time
+import sys
+import os
+import subprocess
+
+
+name = sys.argv[1]
+value = sys.argv[2]
+timestamp = int(time.time())
+key = os.environ['STACKDRIVER_API_KEY']
+
+
+def get_instance_id():
+    args = ['instance-identity', 'instanceId']
+    return subprocess.check_output(args).strip()
+
+
+def submit_custom_metric():
+    data_point = {
+        'name': name,
+        'value': float(value),
+        'collected_at': timestamp,
+        'instance': get_instance_id()
+        }
+    gateway_msg = {
+        'timestamp': timestamp,
+        'proto_version': 1,
+        'data': data_point,
+        }
+    headers = {
+        'content-type': 'application/json',
+        'x-stackdriver-apikey': key
+        }
+    resp = requests.post(
+        'https://custom-gateway.stackdriver.com/v1/custom',
+        data=json.dumps(gateway_msg),
+        headers=headers)
+    if not resp.ok:
+        print resp.content
+        assert resp.ok, 'Failed to submit custom metric.'
+    else:
+        print "Published."
+if __name__ == '__main__':
+    submit_custom_metric()

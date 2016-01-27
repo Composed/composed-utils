@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+global_env_vars="$(sed -e 's/^/export /' /etc/environment)"
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # in subshell, so being eval'd
+  printf '%s\n' "$global_env_vars"
+else
+  # being sourced, so eval ourselves
+  eval "$global_env_vars"
+fi
+
+unset global_env_vars
