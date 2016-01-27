@@ -7,11 +7,9 @@ jobs:
   composed-utils:
     builder: "make"
     base: "quay.io/madebymany/build-bases:trusty"
-# Do we need any?
-#    build_depends:
     packages:
       - type: debian
-      name: composed-utils
+        name: composed-utils
         depends:
           - augeas-tools
           - jq
