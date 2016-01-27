@@ -11,12 +11,12 @@ jobs:
 #    build_depends:
     packages:
       - type: debian
-      name: composed-utils
+      name: composed-utils-private
         depends:
           - augeas-tools
           - jq
           - sed
           - slackcat
         repos:
-          - composed-public
+          - composed-private
         target: install
