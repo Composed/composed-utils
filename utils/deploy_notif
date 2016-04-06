@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo -e "The following package(s) have just been deployed here:\n "$(tail /var/log/apt/history.log |grep -C1 hark) | sed 's/, /\n/g'"" |slackcat
